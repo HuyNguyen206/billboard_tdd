@@ -20,22 +20,13 @@ class ProjectTest extends TestCase
     }
 
 
-    public function test_guest_user_can_not_create_project()
+    public function test_guest_user_can_not_manage_project()
     {
         $data = Project::factory()->raw();
         $this->post(route('projects.store'), $data)
             ->assertRedirect(route('login'));
-    }
-
-    public function test_guest_user_can_not_view_projects()
-    {
-        Project::factory(5)->create();
         $this->get(route('projects.index'))
             ->assertRedirect(route('login'));
-    }
-
-    public function test_guest_user_can_not_view_single_project()
-    {
         $project = Project::factory()->create();
         $this->get(route('projects.show', $project->id))
             ->assertRedirect(route('login'));
@@ -53,7 +44,9 @@ class ProjectTest extends TestCase
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,
         ];
-        $this->actingAs(User::factory()->create())->post('projects', $data)
+        $this->be(User::factory()->create());
+        $this->get(route('projects.create'))->assertStatus(200);
+        $this->post('projects', $data)
             ->assertRedirect(route('projects.index'));
 
         $this->assertDatabaseHas('projects', $data);
@@ -98,4 +91,6 @@ class ProjectTest extends TestCase
 
         $this->assertInstanceOf(User::class, $project->user);
     }
+
+
 }
