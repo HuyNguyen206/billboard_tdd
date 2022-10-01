@@ -8,11 +8,6 @@ use Illuminate\Http\Response;
 
 class ProjectController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['auth'])->except(['show', 'index']);
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -65,6 +60,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
+        abort_if($project->user_id !== auth()->id(), 403);
         return view('projects.show', compact('project'));
     }
 

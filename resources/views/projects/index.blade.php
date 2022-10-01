@@ -11,7 +11,9 @@
 <ul>
     @foreach($projects as $project)
     <li>
-        {{$project->title}}-{{$project->description}}
+        <a href="{{route('projects.show', $project->id)}}">
+            {{$project->title}}-{{$project->description}}
+        </a>
     </li>
     @endforeach
 </ul>

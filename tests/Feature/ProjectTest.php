@@ -20,10 +20,24 @@ class ProjectTest extends TestCase
     }
 
 
-    public function test_only_authenticate_user_can_create_project()
+    public function test_guest_user_can_not_create_project()
     {
         $data = Project::factory()->raw();
-        $this->post('projects', $data)
+        $this->post(route('projects.store'), $data)
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_guest_user_can_not_view_projects()
+    {
+        Project::factory(5)->create();
+        $this->get(route('projects.index'))
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_guest_user_can_not_view_single_project()
+    {
+        $project = Project::factory()->create();
+        $this->get(route('projects.show', $project->id))
             ->assertRedirect(route('login'));
     }
 
@@ -55,11 +69,33 @@ class ProjectTest extends TestCase
             ->assertSessionHasErrors(['title']);
     }
 
-    public function test_a_user_can_view_project()
+    public function test_a_user_can_only_view_his_own_project()
+    {
+        $user = User::factory()->create();
+        $project = Project::factory()->create([
+            'user_id' => $user->id
+        ]);
+
+        $this->actingAs($user)->get(route('projects.show', $project->id))
+            ->assertSee(Arr::only($project->getAttributes(), ['title', 'description']));
+    }
+
+    public function test_authenticate_user_can_not_view_project_of_other()
+    {
+        $user = User::factory()->create();
+        $project = Project::factory()->create([
+            'user_id' => $user->id
+        ]);
+
+        $this->be(User::factory()->create())
+            ->get(route('projects.show', $project->id))
+            ->assertStatus(403);
+    }
+
+    public function test_project_belong_to_user()
     {
         $project = Project::factory()->create();
 
-        $this->get(route('projects.show', $project->id))
-            ->assertSee(Arr::only($project->getAttributes(), ['title', 'description']));
+        $this->assertInstanceOf(User::class, $project->user);
     }
 }

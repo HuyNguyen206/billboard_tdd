@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,6 +22,6 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::resource('projects', \App\Http\Controllers\ProjectController::class);
+Route::resource('projects', \App\Http\Controllers\ProjectController::class)->middleware('auth');
 
 require __DIR__.'/auth.php';
