@@ -51,14 +51,13 @@ class ProjectTest extends TestCase
 
         $this->assertDatabaseHas('projects', $data);
 
-        $this->get('projects')->assertSee($data);
 
     }
 
     public function test_project_required_a_title()
     {
         $data = Project::factory()->raw(['title' => null]);
-        $this->actingAs(User::factory()->create())->post('projects', $data)
+        $this->signIn(User::factory()->create())->post('projects', $data)
             ->assertSessionHasErrors(['title']);
     }
 
@@ -69,7 +68,7 @@ class ProjectTest extends TestCase
             'user_id' => $user->id
         ]);
 
-        $this->actingAs($user)->get(route('projects.show', $project->id))
+        $this->signIn($user)->get(route('projects.show', $project->id))
             ->assertSee(Arr::only($project->getAttributes(), ['title', 'description']));
     }
 
@@ -91,6 +90,4 @@ class ProjectTest extends TestCase
 
         $this->assertInstanceOf(User::class, $project->user);
     }
-
-
 }
