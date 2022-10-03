@@ -39,6 +39,8 @@ class TaskController extends Controller
      */
     public function store(Request $request, Project $project)
     {
+        $this->authorize('update', $project);
+
         $data = $request->validate(['body' => 'required']);
         $project->tasks()->create($data);
 
@@ -73,13 +75,15 @@ class TaskController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Project  $project
      * @param  \App\Models\Task  $task
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Project $project, Task $task)
+    public function update(Request $request, Task $task)
     {
-        //
+//        $task->update([
+//            'body' => $request->body,
+//            'completed' => $request->has('completed')
+//        ]);
     }
 
     /**

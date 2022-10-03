@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
+use Facades\Tests\Setup\ProjectFactory;
 use Tests\TestCase;
 
 class ProjectTest extends TestCase
@@ -44,7 +45,7 @@ class ProjectTest extends TestCase
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,
         ];
-        $this->be(User::factory()->create());
+        $this->signIn(User::factory()->create());
         $this->get(route('projects.create'))->assertStatus(200);
         $this->post('projects', $data)
             ->assertRedirect(route('projects.index'));
@@ -57,30 +58,29 @@ class ProjectTest extends TestCase
     public function test_project_required_a_title()
     {
         $data = Project::factory()->raw(['title' => null]);
-        $this->signIn(User::factory()->create())->post('projects', $data)
+
+        $this->signIn(User::factory()->create());
+
+        $this->post('projects', $data)
             ->assertSessionHasErrors(['title']);
     }
 
     public function test_a_user_can_only_view_his_own_project()
     {
-        $user = User::factory()->create();
-        $project = Project::factory()->create([
-            'user_id' => $user->id
-        ]);
+        $user = $this->signIn();
 
-        $this->signIn($user)->get(route('projects.show', $project->id))
+        $project = ProjectFactory::ownedBy($user)->create();
+
+        $this->get(route('projects.show', $project->id))
             ->assertSee(Arr::only($project->getAttributes(), ['title', 'description']));
     }
 
     public function test_authenticate_user_can_not_view_project_of_other()
     {
-        $user = User::factory()->create();
-        $project = Project::factory()->create([
-            'user_id' => $user->id
-        ]);
+        $project = ProjectFactory::create();
 
-        $this->be(User::factory()->create())
-            ->get(route('projects.show', $project->id))
+        $this->signIn();
+        $this->get(route('projects.show', $project->id))
             ->assertStatus(403);
     }
 
@@ -89,5 +89,29 @@ class ProjectTest extends TestCase
         $project = Project::factory()->create();
 
         $this->assertInstanceOf(User::class, $project->user);
+    }
+
+    public function test_user_can_update_project()
+    {
+        $user = $this->signIn();
+        $project = ProjectFactory::ownedBy($user)->create(['notes' => 'new', 'title' => 'new', 'description' => 'new']);
+
+        $this->patch(route('projects.update', $project->id), ['notes' => 'update', 'title' => 'update', 'description' => 'update']);
+        $this->assertDatabaseHas('projects', [
+            'notes' => 'update',
+            'title' => 'update',
+            'description' => 'update'
+        ]);
+    }
+
+    public function test_user_can_update_project_note()
+    {
+        $user = $this->signIn();
+        $project = ProjectFactory::ownedBy($user)->create(['notes' => 'new']);
+
+        $this->patch(route('projects.update', $project->id), ['notes' => 'update']);
+        $this->assertDatabaseHas('projects', [
+            'notes' => 'update',
+        ]);
     }
 }

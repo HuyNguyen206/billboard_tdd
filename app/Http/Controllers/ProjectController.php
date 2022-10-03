@@ -16,10 +16,11 @@ class ProjectController extends Controller
     public function index()
     {
         if ($user = auth()->user()) {
-            $projects = $user->projects;
+            $projects = $user->projects();
         } else {
-            $projects = Project::all();
+            $projects = Project::query();
         }
+        $projects = $projects->latest('updated_at')->get();
 
         return view('projects.index', compact('projects'));
     }
@@ -31,7 +32,7 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        return view('projects.create');
+        return view('projects.create', ['project' => new Project()]);
     }
 
     /**
@@ -60,7 +61,8 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        abort_if($project->user_id !== auth()->id(), 403);
+        $this->authorize('update', $project);
+
         return view('projects.show', compact('project'));
     }
 
@@ -70,9 +72,9 @@ class ProjectController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function edit($id)
+    public function edit(Project $project)
     {
-        //
+        return view('projects.edit', compact('project'));
     }
 
     /**
@@ -82,9 +84,18 @@ class ProjectController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Project $project)
     {
-        //
+        $this->authorize('update', $project);
+        $data = $request->validate([
+            'title' => 'sometimes|required',
+            'description' => 'sometimes|required',
+            'notes' => 'max:500'
+        ]);
+
+        $project->update($data);
+
+        return redirect(route('projects.show', $project->id));
     }
 
     /**

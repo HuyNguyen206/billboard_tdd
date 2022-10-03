@@ -2,13 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\Project;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Task>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Activity>
  */
-class TaskFactory extends Factory
+class ActivityFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,8 +17,7 @@ class TaskFactory extends Factory
     public function definition()
     {
         return [
-            'body' => $this->faker->paragraph,
-            'project_id' => Project::factory()
+            //
         ];
     }
 }
