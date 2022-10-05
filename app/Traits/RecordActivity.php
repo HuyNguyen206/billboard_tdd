@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Models\Activity;
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -12,7 +13,7 @@ trait RecordActivity
 {
     public static function bootRecordActivity()
     {
-        $recordableEvents = ['deleted', 'created', 'updated'];
+        $recordableEvents = static::recordableEvents();
 
         foreach ($recordableEvents as $event) {
             static::$event(function (Model $subject) use($event){
@@ -25,6 +26,15 @@ trait RecordActivity
                 }
             });
         }
+    }
+
+    protected static function recordableEvents()
+    {
+        if (isset(static::$recordableEvents)) {
+            return static::$recordableEvents;
+        }
+
+        return ['created', 'updated'];
     }
     /**
      * @return array
@@ -42,11 +52,11 @@ trait RecordActivity
         $isProjectActivity = class_basename($this) === 'Project';
         $data = [
                 'project_id' => $isProjectActivity ? $this->id : $this->project_id,
-            ] + compact('description');
+            ] + ['description' => $description, 'user_id' => ($this->user_id ?? $this->project->user_id)];
 
         if ($this->wasChanged()) {
             [$after, $before] = $this->activityChanges();
-            $data += ['changes' => compact('before', 'after')];
+            $data += ['changes_log' => compact('before', 'after')];
         }
 
         $this->ownActivities()->create($data);

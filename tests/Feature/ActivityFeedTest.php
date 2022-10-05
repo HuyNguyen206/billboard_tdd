@@ -24,7 +24,7 @@ class ActivityFeedTest extends TestCase
     {
         $project = Project::factory()->create();
         self::assertCount(1, $project->activities);
-        self::assertEquals('created project', $project->activities()->first()->description);
+        self::assertEquals("{$project->user->name} created project", $project->activities()->first()->description_extend);
     }
 
     /**
@@ -39,7 +39,7 @@ class ActivityFeedTest extends TestCase
            'title' => 'updated'
         ]);
         self::assertCount(2, $project->activities);
-        self::assertEquals('updated project', $project->activities()->latest('id')->first()->description);
+        self::assertEquals("{$project->user->name} updated title of the project", $project->activities()->latest('id')->first()->description_extend);
     }
 
     public function test_create_new_task_record_project_activity()
@@ -47,7 +47,7 @@ class ActivityFeedTest extends TestCase
         $project = ProjectFactory::withTask(1)->create();
         self::assertCount(1, $project->ownActivities);
         $latestActivities = $project->tasks[0]->ownActivities()->latest('id')->first();
-        self::assertEquals('created task', $latestActivities->description);
+        self::assertEquals("{$project->user->name} created task", $latestActivities->description_extend);
         self::assertInstanceOf(Task::class, $latestActivities->subject);
     }
 
@@ -66,9 +66,8 @@ class ActivityFeedTest extends TestCase
             ->call('updateTask');
 
         self::assertCount(2, $task->ownActivities);
-        $data = Activity::get('description')->pluck('description')->toArray();
-        self::assertContains('created task', $data);
-        self::assertContains('completed task', $data);
+        $activity = Activity::latest('id')->first();
+        self::assertEquals("$user->name completed task", $activity->description_extend);
     }
 
     public function test_in_complete_task_records_project_activity()
@@ -86,12 +85,8 @@ class ActivityFeedTest extends TestCase
 
         self::assertCount(1, $project->ownActivities);
 
-        $data = Activity::get('description')->pluck('description')->toArray();
-
-        self::assertContains('created project', $data);
-        self::assertContains('created task', $data);
-        self::assertContains('completed task', $data);
-        self::assertContains('uncompleted task', $data);
+        $activity = Activity::latest('id')->first();
+        self::assertEquals("$user->name uncompleted task", $activity->description_extend);
     }
 
     public function test_delete_a_task()
@@ -103,7 +98,7 @@ class ActivityFeedTest extends TestCase
             ->call('deleteTask');
 
         self::assertCount(2, $task->ownActivities);
-        $data = Activity::get('description')->pluck('description')->toArray();
-        self::assertContains('deleted task', $data);
+        $activity = Activity::latest('id')->first();
+        self::assertEquals("{$activity->user->name} deleted task", $activity->description_extend);
     }
 }

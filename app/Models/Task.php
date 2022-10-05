@@ -11,6 +11,8 @@ class Task extends Model
     use HasFactory;
     use RecordActivity;
 
+    protected static array $recordableEvents = ['created', 'updated', 'deleted'];
+
     protected $touches = ['project'];
     protected $casts = [
         'completed' => 'boolean'

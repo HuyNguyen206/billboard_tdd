@@ -12,7 +12,7 @@ class Activity extends Model
     use HasFactory;
 
     protected $casts = [
-        'changes' => 'array'
+        'changes_log' => 'array'
     ];
 
     /**
@@ -21,13 +21,6 @@ class Activity extends Model
     public function subject()
     {
         return $this->morphTo();
-    }
-
-    public function activityDes(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => "You {$this->description}"
-        );
     }
 
     public function getDesDetailAttribute()
@@ -39,5 +32,21 @@ class Activity extends Model
     public function getAtDateAttribute()
     {
         return $this->created_at->diffForHumans();
+    }
+
+    public function getDescriptionExtendAttribute()
+    {
+        $userName = $this->user->name;
+        if (Str::contains($this->description, 'updated')) {
+            if ($this->changes_log && count($this->changes_log['after']) === 1) {
+               return sprintf('%s updated %s of the %s', $userName, key($this->changes_log['after']), Str::lower(class_basename($this->subject)));
+            }
+        }
+        return "$userName {$this->description}";
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

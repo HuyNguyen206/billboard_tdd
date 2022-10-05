@@ -16,7 +16,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $users = \App\Models\User::factory(10)->create();
+        $huy = \App\Models\User::factory()->create([
+            'email' => 'nguyenlehuyuit@gmail.com'
+        ]);
+        $users = (\App\Models\User::factory(10)->create())->push($huy);
 //        $projects = Project::factory(5)->create();
         $users->each(function ($user) {
             Project::factory(rand(2, 5))->create(['user_id' => $user->id]);

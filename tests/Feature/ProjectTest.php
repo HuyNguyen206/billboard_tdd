@@ -50,7 +50,7 @@ class ProjectTest extends TestCase
         $this->post('projects', $data)
             ->assertRedirect(route('projects.index'));
 
-        $this->assertNull(Project::first()->activities->last()->changes);
+        $this->assertNull(Project::first()->activities->last()->changes_log);
 
         $this->assertDatabaseHas('projects', $data);
 
@@ -102,7 +102,7 @@ class ProjectTest extends TestCase
         $this->assertDatabaseHas('projects', [
             'notes' => 'update',
         ]);
-        $this->assertEquals($project->activities->last()->changes, [
+        $this->assertEquals($project->activities->last()->changes_log, [
             'before' => ['notes' => 'new'],
             'after' => ['notes' => 'update']
         ]);
@@ -118,4 +118,34 @@ class ProjectTest extends TestCase
             'notes' => 'update',
         ]);
     }
+
+    public function test_user_can_delete_project()
+    {
+        $user = $this->signIn();
+        $project = ProjectFactory::ownedBy($user)->create();
+        $this->assertDatabaseHas('projects', $project->getAttributes());
+        $this->delete(route('projects.destroy', $project->id));
+
+        $this->assertDatabaseMissing('projects', $project->getAttributes());
+    }
+
+    public function test_guest_user_can_not_delete_project()
+    {
+        $project = ProjectFactory::create();
+        $this->assertDatabaseHas('projects', $project->getAttributes());
+        $this->delete(route('projects.destroy', $project->id))->assertRedirect(route('login'));
+
+        $this->assertDatabaseHas('projects', $project->getAttributes());
+    }
+
+    public function test_auth_user_can_not_delete_other_project()
+    {
+        $project = ProjectFactory::create();
+        $this->assertDatabaseHas('projects', $project->getAttributes());
+        $this->signIn();
+        $this->delete(route('projects.destroy', $project->id))->assertStatus(403);
+
+        $this->assertDatabaseHas('projects', $project->getAttributes());
+    }
+
 }
