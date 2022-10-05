@@ -2,8 +2,6 @@
 
 namespace App\Providers;
 
-use App\Models\Project;
-use App\Observers\ProjectObserver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,6 +25,5 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Model::unguard();
-        Project::observe(ProjectObserver::class);
     }
 }

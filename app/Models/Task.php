@@ -2,38 +2,32 @@
 
 namespace App\Models;
 
+use App\Traits\RecordActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Task extends Model
 {
     use HasFactory;
+    use RecordActivity;
 
     protected $touches = ['project'];
-
-    protected static function booted()
-    {
-        static::created(function (Task $task){
-            Activity::create([
-                'description' => 'created task',
-                'project_id' => $task->project_id
-            ]);
-        });
-
-        static::updated(function (Task $task){
-            if (!$task->isDirty('completed')) {
-              return;
-            }
-
-            Activity::create([
-                'description' => $task->completed ? 'completed task' : 'uncompleted task',
-                'project_id' => $task->project_id
-            ]);
-        });
-    }
+    protected $casts = [
+        'completed' => 'boolean'
+    ];
 
     public function project()
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function complete()
+    {
+        $this->update(['completed' => true]);
+    }
+
+    public function incomplete()
+    {
+        $this->update(['completed' => false]);
     }
 }

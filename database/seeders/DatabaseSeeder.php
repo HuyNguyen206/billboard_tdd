@@ -19,11 +19,11 @@ class DatabaseSeeder extends Seeder
         $users = \App\Models\User::factory(10)->create();
 //        $projects = Project::factory(5)->create();
         $users->each(function ($user) {
-            $user->projects()->createMany(Project::factory(rand(2, 5))->raw());
+            Project::factory(rand(2, 5))->create(['user_id' => $user->id]);
         });
 
         Project::all()->each(function ($project) {
-            $project->tasks()->createMany(Task::factory(rand(2, 5))->raw());
+           Task::factory(rand(2, 5))->create(['project_id' => $project->id]);
         });
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',

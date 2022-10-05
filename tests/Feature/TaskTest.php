@@ -53,7 +53,7 @@ class TaskTest extends TestCase
             ->call('updateTask')
             ->assertStatus(200);
 
-        $this->assertDatabaseHas('tasks', ['body' => 'new update']);
+        $this->assertDatabaseHas('tasks', ['body' => 'new update', 'completed' => true]);
 
     }
 

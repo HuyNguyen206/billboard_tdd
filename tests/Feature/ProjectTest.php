@@ -50,6 +50,8 @@ class ProjectTest extends TestCase
         $this->post('projects', $data)
             ->assertRedirect(route('projects.index'));
 
+        $this->assertNull(Project::first()->activities->last()->changes);
+
         $this->assertDatabaseHas('projects', $data);
 
 
@@ -96,11 +98,13 @@ class ProjectTest extends TestCase
         $user = $this->signIn();
         $project = ProjectFactory::ownedBy($user)->create(['notes' => 'new', 'title' => 'new', 'description' => 'new']);
 
-        $this->patch(route('projects.update', $project->id), ['notes' => 'update', 'title' => 'update', 'description' => 'update']);
+        $this->patch(route('projects.update', $project->id), ['notes' => 'update']);
         $this->assertDatabaseHas('projects', [
             'notes' => 'update',
-            'title' => 'update',
-            'description' => 'update'
+        ]);
+        $this->assertEquals($project->activities->last()->changes, [
+            'before' => ['notes' => 'new'],
+            'after' => ['notes' => 'update']
         ]);
     }
 

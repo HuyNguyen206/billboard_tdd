@@ -32,8 +32,9 @@ font-bold text-xl text-gray-400">
                     <form action="{{route('projects.update', $project->id)}}" method="post">
                         @method('patch')
                         @csrf
-                         <textarea placeholder="Add note..." style="min-height: 200px" class="w-full bg-white border-0" name="notes" id="" cols="30"
-                                   rows="10">{{$project->notes}}</textarea>
+                        <textarea placeholder="Add note..." style="min-height: 200px" class="w-full bg-white border-0"
+                                  name="notes" id="" cols="30"
+                                  rows="10">{{$project->notes}}</textarea>
                         <button class="px-4 py-2 rounded-full bg-blue-600 text-white">Save</button>
                     </form>
 
@@ -42,6 +43,12 @@ font-bold text-xl text-gray-400">
         </div>
         <div class="lg:w-1/4">
             <x-card :project="$project" :isLimitHeight="false"></x-card>
+            <livewire:activity-timeline :project="$project"/>
+{{--            <ul class="w-48 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white">--}}
+{{--                @foreach($project->activities as $activity)--}}
+{{--                    <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600">{{$activity->description}}</li>--}}
+{{--                @endforeach--}}
+{{--            </ul>--}}
         </div>
 
     </div>

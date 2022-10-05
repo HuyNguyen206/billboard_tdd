@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\RecordActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
     use HasFactory;
+    use RecordActivity;
 
     public function user()
     {
@@ -26,6 +28,6 @@ class Project extends Model
 
     public function activities()
     {
-        return $this->hasMany(Activity::class);
+        return $this->hasMany(Activity::class)->latest();
     }
 }

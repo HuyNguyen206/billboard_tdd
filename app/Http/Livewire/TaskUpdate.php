@@ -35,9 +35,24 @@ class TaskUpdate extends Component
         $this->authorize('update', $project);
 
         $this->validate();
-        $this->task->update([
-            'body' => $this->body,
-            'completed' => $this->completed ?? false
-        ]);
+
+        $this->task->update(['body' => $this->body, 'completed' => $this->completed]);
+
+//        if ($this->completed) {
+//            $this->task->complete();
+//        } else {
+//            $this->task->incomplete();
+//        }
+
+        $this->emitTo(ActivityTimeline::class, 'changeTask');
+    }
+
+    public function deleteTask()
+    {
+        $project = $this->task->project;
+        $this->authorize('delete', $project);
+
+        $this->task->delete();
+        $this->emitTo(ActivityTimeline::class, 'changeTask');
     }
 }
