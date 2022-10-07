@@ -53,7 +53,7 @@ class ProjectPolicy
      */
     public function update(User $user, Project $project)
     {
-        return $user->id === $project->user_id;
+        return $project->hasOwner($user) || $project->hasMember($user);
     }
 
     /**
@@ -90,5 +90,10 @@ class ProjectPolicy
     public function forceDelete(User $user, Project $project)
     {
         //
+    }
+
+    public function invite(User $user, Project $project)
+    {
+        return $project->hasOwner($user);
     }
 }

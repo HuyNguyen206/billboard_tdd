@@ -10,9 +10,14 @@ font-bold text-xl text-gray-400">
             </p>
             <a class="px-4 py-2 rounded-full bg-blue-600 text-white" href="{{route('projects.create')}}">Add task</a>
         </div>
+        <div class="flex">
+            @foreach($project->members as $member)
+                <img width="40" class="rounded-full mr-2" src="{{$member->avatar()}}"/>
+            @endforeach
+            <a class="px-4 py-2 rounded-full bg-blue-600 text-white" href="{{route('projects.edit', $project->id)}}">Edit
+                project</a>
+        </div>
 
-        <a class="px-4 py-2 rounded-full bg-blue-600 text-white" href="{{route('projects.edit', $project->id)}}">Edit
-            project</a>
     </div>
     <div class="lg:flex">
         <div class="lg:w-3/4 mb-2 lg:mb-0 mr-2">
@@ -35,6 +40,11 @@ font-bold text-xl text-gray-400">
                         <textarea placeholder="Add note..." style="min-height: 200px" class="w-full bg-white border-0"
                                   name="notes" id="" cols="30"
                                   rows="10">{{$project->notes}}</textarea>
+                        @error('notes')
+                        <p id="standard_error_help" class="mt-2 text-xs text-red-600 dark:text-red-400">
+                            {{$message}}
+                        </p>
+                        @enderror
                         <button class="px-4 py-2 rounded-full bg-blue-600 text-white">Save</button>
                     </form>
 
@@ -44,11 +54,14 @@ font-bold text-xl text-gray-400">
         <div class="lg:w-1/4">
             <x-card :project="$project" :isLimitHeight="false"></x-card>
             <livewire:activity-timeline :project="$project"/>
-{{--            <ul class="w-48 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white">--}}
-{{--                @foreach($project->activities as $activity)--}}
-{{--                    <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600">{{$activity->description}}</li>--}}
-{{--                @endforeach--}}
-{{--            </ul>--}}
+            @can('invite', $project)
+                <x-invite-user/>
+            @endcan
+            {{--            <ul class="w-48 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white">--}}
+            {{--                @foreach($project->activities as $activity)--}}
+            {{--                    <li class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600">{{$activity->description}}</li>--}}
+            {{--                @endforeach--}}
+            {{--            </ul>--}}
         </div>
 
     </div>

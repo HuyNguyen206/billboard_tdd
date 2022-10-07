@@ -10,6 +10,7 @@
                     <x-card :project="$project"></x-card>
                 </div>
             @endforeach
+            {{$projects->links()}}
         </div>
 
     </div>

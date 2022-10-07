@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
 use Facades\Tests\Setup\ProjectFactory;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class ProjectTest extends TestCase
@@ -146,6 +147,15 @@ class ProjectTest extends TestCase
         $this->delete(route('projects.destroy', $project->id))->assertStatus(403);
 
         $this->assertDatabaseHas('projects', $project->getAttributes());
+    }
+
+    public function test_user_can_see_all_project_they_have_been_invited_to_on_their_dashboard()
+    {
+        $user = $this->signIn();
+        ProjectFactory::ownedBy($user)->create();
+        $project = tap(ProjectFactory::create())->invite($user);
+        self::assertEquals(2, $user->accessibleProjectsQuery()->count());
+        $this->get(route('projects.index'))->assertSee(Str::limit($project->title, 30));
     }
 
 }

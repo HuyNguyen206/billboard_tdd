@@ -16,11 +16,11 @@ class ProjectController extends Controller
     public function index()
     {
         if ($user = auth()->user()) {
-            $projects = $user->projects();
+            $projects = $user->accessibleProjectsQuery();
         } else {
             $projects = Project::query();
         }
-        $projects = $projects->latest('updated_at')->get();
+        $projects = $projects->latest('updated_at')->paginate(5);
 
         return view('projects.index', compact('projects'));
     }
@@ -90,7 +90,7 @@ class ProjectController extends Controller
         $data = $request->validate([
             'title' => 'sometimes|required',
             'description' => 'sometimes|required',
-            'notes' => 'max:500'
+            'notes' => 'min:1|max:500'
         ]);
 
         $project->update($data);

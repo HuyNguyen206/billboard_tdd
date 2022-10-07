@@ -5,6 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Project;
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -17,7 +18,8 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $huy = \App\Models\User::factory()->create([
-            'email' => 'nguyenlehuyuit@gmail.com'
+            'email' => 'nguyenlehuyuit@gmail.com',
+            'name' => 'huy'
         ]);
         $users = (\App\Models\User::factory(10)->create())->push($huy);
 //        $projects = Project::factory(5)->create();
@@ -27,10 +29,9 @@ class DatabaseSeeder extends Seeder
 
         Project::all()->each(function ($project) {
            Task::factory(rand(2, 5))->create(['project_id' => $project->id]);
+
+           $project->members()->attach(User::query()->where('id', '!=', $project->user_id)->inRandomOrder()->take(rand(2, 6))->get());
         });
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+
     }
 }

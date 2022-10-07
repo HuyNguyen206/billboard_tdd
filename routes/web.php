@@ -26,6 +26,7 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     Route::resource('projects', \App\Http\Controllers\ProjectController::class)->middleware('auth');
     Route::resource('projects.tasks', TaskController::class)->shallow();
+    Route::post('projects/{project}/invite', [\App\Http\Controllers\ProjectInvitationController::class, 'invite'])->name('projects.invite');
 });
 
 require __DIR__.'/auth.php';
