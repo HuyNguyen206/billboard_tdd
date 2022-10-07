@@ -23,13 +23,13 @@ font-bold text-xl text-gray-400">
         <div class="lg:w-3/4 mb-2 lg:mb-0 mr-2">
             <div>
                 <div class="mb-4">
-                    <h2 class="font-bold text-xl text-gray-400">Tasks</h2>
+                    <h2 class="font-bold text-xl text-default-color">Tasks</h2>
                     @foreach($project->tasks as $task)
                         <livewire:task-update :task="$task"/>
                     @endforeach
                     <form method="post" action="{{route('projects.tasks.store', $project->id)}}">
                         @csrf
-                        <input type="text" placeholder="Add new task..." class="w-full border-none " name="body">
+                        <input type="text" placeholder="Add new task..." class="bg-card text-default-color w-full border-none " name="body">
                     </form>
                 </div>
                 <div>
@@ -37,7 +37,7 @@ font-bold text-xl text-gray-400">
                     <form action="{{route('projects.update', $project->id)}}" method="post">
                         @method('patch')
                         @csrf
-                        <textarea placeholder="Add note..." style="min-height: 200px" class="w-full bg-white border-0"
+                        <textarea placeholder="Add note..." style="min-height: 200px" class="w-full bg-card text-default-color border-0"
                                   name="notes" id="" cols="30"
                                   rows="10">{{$project->notes}}</textarea>
                         @error('notes')
@@ -55,7 +55,7 @@ font-bold text-xl text-gray-400">
             <x-card :project="$project" :isLimitHeight="false"></x-card>
             <livewire:activity-timeline :project="$project"/>
             @can('invite', $project)
-                <x-invite-user/>
+                <x-invite-user :project="$project"/>
             @endcan
             {{--            <ul class="w-48 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white">--}}
             {{--                @foreach($project->activities as $activity)--}}

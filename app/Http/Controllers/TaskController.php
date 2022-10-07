@@ -43,7 +43,6 @@ class TaskController extends Controller
 
         $data = $request->validate(['body' => 'required']);
         $project->tasks()->create($data);
-
         return redirect(route('projects.show', $project->id));
     }
 
