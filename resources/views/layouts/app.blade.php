@@ -13,8 +13,11 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
+        <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     </head>
-    <body class="theme-dark font-sans antialiased bg-page">
+    <body class="font-sans antialiased bg-page" x-cloak x-data x-init="
+                         document.body.classList.add(localStorage.getItem('theme') || 'theme-light')
+                         ">
         <div class="min-h-screen bg-page">
             @include('layouts.navigation')
 

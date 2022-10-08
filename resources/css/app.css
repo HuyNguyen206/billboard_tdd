@@ -1,20 +1,8 @@
+@import "theme/light-theme";
+@import "theme/dark-theme";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-.theme-light {
-    --page-bg-color: #F5F6F9;
-    --card-bg-color: white;
-    --button-bg-color: #47cdff;
-    --nav-bg-color: white;
-}
-
-.theme-dark {
-    --page-bg-color: #17181E;
-    --card-bg-color: #1f2027;
-    --button-bg-color: #5986f9;
-    --nav-bg-color: #1f2027;
-    --text-default: white
-}
-
-
+[x-cloak] { display: none }
