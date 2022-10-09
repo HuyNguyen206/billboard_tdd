@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
 use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
@@ -24,7 +25,10 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::resource('projects', \App\Http\Controllers\ProjectController::class)->middleware('auth');
+    Route::resource('projects', \App\Http\Controllers\ProjectController::class)->except('store')->middleware('auth');
+
+    Route::post('projects/{project?}', [ProjectController::class, 'store'])->name('projects.store');
+
     Route::resource('projects.tasks', TaskController::class)->shallow();
     Route::post('projects/{project}/invite', [\App\Http\Controllers\ProjectInvitationController::class, 'invite'])->name('projects.invite');
 });

@@ -3,7 +3,7 @@
  'isLimitHeight' => true
 ])
 <div @if($isLimitHeight) style="height: 200px"
-     @endif class="relative bg-card p-6 inline-block rounded-lg shadow-md z-10">
+     @endif class="w-full relative bg-card p-6 inline-block rounded-lg shadow-md z-10">
     @if($project->hasMember(auth()->user()))
         <span
             class="inline-block float-right mr-2 mb-4 bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-green-200 dark:text-green-900">Shared project</span>
