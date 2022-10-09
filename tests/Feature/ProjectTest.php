@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Http\Livewire\CreateProject;
 use App\Models\Project;
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -156,6 +158,53 @@ class ProjectTest extends TestCase
         $project = tap(ProjectFactory::create())->invite($user);
         self::assertEquals(2, $user->accessibleProjectsQuery()->count());
         $this->get(route('projects.index'))->assertSee(Str::limit($project->title, 30));
+    }
+
+    public function test_create_project_with_modal()
+    {
+        $this->signIn();
+        $this->assertDatabaseMissing('projects', ['title' => 'test']);
+        self::assertCount(0, Project::all());
+        \Livewire::test(CreateProject::class)
+            ->set('title', 'test')
+            ->set('description', 'test')
+            ->set('tasks', [['body' => '']])
+            ->call('createProject');
+
+
+        $this->assertDatabaseHas('projects', ['title' => 'test']);
+        self::assertCount(1, Project::all());
+    }
+
+    public function test_create_project_along_with_task_with_modal()
+    {
+        $this->signIn();
+        $this->assertDatabaseMissing('tasks', ['body' => 'test']);
+        self::assertCount(0, Task::all());
+        \Livewire::test(CreateProject::class)
+            ->set('title', 'test')
+            ->set('description', 'test')
+            ->set('tasks', [['body' => 'test']])
+            ->call('createProject');
+
+        $this->assertDatabaseHas('tasks', ['body' => 'test', 'project_id' => 1]);
+        self::assertCount(1, Task::all());
+    }
+
+
+    public function test_create_project_require_title_desc__with_modal()
+    {
+        $this->signIn();
+        \Livewire::test(CreateProject::class)
+            ->set('title', '')
+            ->set('description', '')
+            ->call('createProject')
+            ->assertHasErrors('title')
+            ->assertHasErrors('description');
+
+
+        $this->assertDatabaseMissing('projects', ['title' => 'test']);
+        self::assertCount(0, Project::all());
     }
 
 }

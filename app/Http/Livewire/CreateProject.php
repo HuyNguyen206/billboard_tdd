@@ -8,7 +8,7 @@ use Livewire\Component;
 
 class CreateProject extends Component
 {
-    public $tasks = [];
+    public $tasks = [['body' => '']];
     public $title;
     public $description;
     public $show = false;
@@ -24,15 +24,21 @@ class CreateProject extends Component
         return view('livewire.create-project');
     }
 
+    public function initModel()
+    {
+        $this->reset();
+        $this->show = true;
+    }
+
     public function createProject()
     {
-        dd($this->tasks);
+        $hasTask = collect(Arr::flatten($this->tasks))->filter()->count();
         $validatedData = $this->validate();
 
-        $project = DB::transaction(function () use($validatedData){
+        $project = DB::transaction(function () use($validatedData, $hasTask){
             $project = auth()->user()->projects()->create(Arr::except($validatedData, ['tasks']));
-            dd($this->tasks, $validatedData);
-            if($this->tasks) {
+
+            if($hasTask) {
                 $project->tasks()->createMany($validatedData['tasks']);
             }
 
